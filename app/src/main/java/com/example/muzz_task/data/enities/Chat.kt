@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class Chat(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val messages: List<Message>
+    val messages: List<Message> = emptyList()
 )

@@ -5,6 +5,5 @@ import com.airbnb.epoxy.PackageModelViewConfig
 import com.example.muzz_task.R
 
 @PackageModelViewConfig(rClass = R::class)
-@EpoxyDataBindingLayouts(value = [R.layout.transactions_item, R.layout.portfolio_stock_item,
-                        R.layout.trending_item, R.layout.favorites_stock_item])
+@EpoxyDataBindingLayouts(value = [R.layout.sender_message_item, R.layout.replayer_message_item])
 interface EpoxyConfig

@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:id="@+id/appbar_layout"
@@ -10,21 +11,24 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingVertical="18dp"
-        android:paddingHorizontal="12dp"
+        android:paddingEnd="18dp"
         android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/back_arrow"
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:src="@drawable/ic_back"
+            android:scaleType="centerCrop"
+            android:paddingStart="24dp"
             app:tint="@color/pink"/>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginStart="8dp"
             app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
             android:src="@drawable/ic_launcher_background"/>
 
@@ -34,7 +38,6 @@
             android:text="@string/android"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
             android:paddingStart="8dp"/>
 
         <View
@@ -45,6 +48,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:tint="@color/gray_metal"
             android:src="@drawable/baseline_more_horiz_24"/>
 
     </LinearLayout>
@@ -56,9 +60,13 @@
         android:background="@drawable/shadow_top_bottom"
         app:layout_constraintTop_toBottomOf="@id/appbar_layout"/>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.airbnb.epoxy.EpoxyRecyclerView
+        android:id="@+id/chat_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        tools:listitem="@layout/sender_message_item"
+        app:itemSpacing="12dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/shadow_appbar"
         app:layout_constraintBottom_toTopOf="@id/shadow_send_text"/>
 
@@ -84,6 +92,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:textSize="18sp"
+            android:paddingHorizontal="20dp"
             android:layout_marginEnd="8dp"
             android:inputType="text"
             android:background="@drawable/send_text_background_shape_inactive"/>

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ChatDao {
 
     @Upsert
-    fun upsertChat(chat: Chat)
+    suspend fun upsertChat(chat: Chat)
 
     @Query("select * from chat_table")
     fun getChat(): Flow<Chat>

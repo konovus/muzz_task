@@ -1,10 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        navigationVersion = '2.5.3'
-        fragmentVersion = "1.5.1"
         epoxyVersion = "4.6.3"
+        fragmentVersion = "1.5.1"
+        lifecycleVersion = "2.5.1"
+        navigationVersion = '2.5.3'
         roomVersion = "2.5.0"
+
 
     }
 

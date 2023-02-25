@@ -79,6 +79,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <EditText
+            android:id="@+id/send_text_et"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -88,6 +89,7 @@
             android:background="@drawable/send_text_background_shape_inactive"/>
 
         <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/send_button_ib"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"

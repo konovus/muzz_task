@@ -1,11 +1,17 @@
 package com.example.muzz_task.util
 
+import com.example.muzz_task.data.enities.Message
+
 class ReplyGenerator {
 
-    fun getReply(): String? {
-        val replyChance = (0..3).random()
+    fun getReply(): Message? {
+        val replyChance = (0..1).random()
         return if (replyChance == 0)
-            replies.random()
+            Message(
+                text = replies.random(),
+                timestamp = System.currentTimeMillis(),
+                user = "Replayer"
+            )
         else null
     }
     companion object{

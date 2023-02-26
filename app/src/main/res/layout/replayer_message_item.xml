@@ -6,6 +6,9 @@
         <variable
             name="text"
             type="String" />
+        <variable
+            name="tail"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,13 +17,14 @@
 
         <TextView
             android:id="@+id/text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="100dp"
             android:padding="8dp"
             android:text="@{text}"
             android:textSize="18sp"
             android:textColor="@color/black"
-            android:background="@drawable/replayer_bubble_no_tail"
+            android:background="@{tail == true ? @drawable/replayer_bubble_tail_bottom : @drawable/replayer_bubble_no_tail}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>

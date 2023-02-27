@@ -1,9 +1,11 @@
 package com.example.muzz_task.ui.chatScreen
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.muzz_task.TAG
 import com.example.muzz_task.data.dao.ChatDao
 import com.example.muzz_task.data.enities.Chat
 import com.example.muzz_task.data.enities.Message
@@ -18,7 +20,7 @@ class ChatViewModel @Inject constructor(
 ): ViewModel() {
 
     private val chatFlow = MutableStateFlow(Chat())
-    val chat: LiveData<Chat> = dao.getChat().map {
+    val chat: LiveData<Chat> = dao.getChat().filterNotNull().map {
         chatFlow.value = it
         it
     }.asLiveData()

@@ -4,18 +4,22 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.muzz_task.*
-import com.example.muzz_task.data.enities.Chat
 import com.example.muzz_task.data.enities.Message
 import com.example.muzz_task.databinding.ChatFragmentBinding
 import com.example.muzz_task.util.Constants.ONE_HOUR
 import com.example.muzz_task.util.Constants.TWENTY_SECONDS
 import com.example.muzz_task.util.ReplyGenerator
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -28,7 +32,9 @@ class ChatFragment: Fragment(R.layout.chat_fragment) {
     private val viewModel by viewModels<ChatViewModel>()
     @Inject
     lateinit var replyGenerator: ReplyGenerator
-    var replyOffset = 0
+    private var replyOffset = 0
+    private var userHasScrolled = false
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,12 +47,12 @@ class ChatFragment: Fragment(R.layout.chat_fragment) {
 
 
     private fun observeChat() = binding.apply {
-        viewModel.chat.observe(viewLifecycleOwner) { chat ->
-            if (chat == null) return@observe
+        viewModel.messagesPaged.observe(viewLifecycleOwner) { messages ->
+            if (messages == null) return@observe
 
             chatRecyclerview.withModels {
-                chat.messages.forEachIndexed { index, message ->
-                    val prevMessage = if (index > 0) chat.messages[index - 1] else message
+                messages.forEachIndexed { index, message ->
+                    val prevMessage = if (index > 0) messages[index - 1] else message
 
                     if (index == 0 || (message.timestamp.minus(prevMessage.timestamp) > ONE_HOUR))
                         timestampItem{
@@ -59,28 +65,44 @@ class ChatFragment: Fragment(R.layout.chat_fragment) {
                         senderMessageItem {
                             id(message.timestamp)
                             text(message.text)
-                            tail(bubbleTailCheck(index, message, prevMessage, chat))
+                            tail(bubbleTailCheck(index, message, prevMessage, messages))
                         }
 
                     if (message.user == "Replayer")
                         replayerMessageItem {
                             id(message.timestamp)
                             text(message.text)
-                            tail(bubbleTailCheck(index, message, prevMessage, chat))
+                            tail(bubbleTailCheck(index, message, prevMessage, messages))
                         }
                 }
 
-                if (chatRecyclerview.adapter?.itemCount == 0)
-                    chatRecyclerview.scrollToPosition(chat.messages.size - 1)
-                else chatRecyclerview.layoutManager?.scrollToPosition(chatRecyclerview.adapter!!.itemCount + replyOffset )
-
-                replyOffset = 0
-
+                scrollToBottom(messages.size)
             }
+        }
+
+        viewModel.chat.observe(viewLifecycleOwner) {
+            //todo
+        }
+    }
+
+    private fun scrollToBottom(position: Int) = binding.apply {
+        if (!userHasScrolled || !chatRecyclerview.layoutManager!!.canScrollVertically()) {
+            if (chatRecyclerview.adapter?.itemCount == 0)
+                chatRecyclerview.scrollToPosition(position)
+            else chatRecyclerview.scrollToPosition(chatRecyclerview.adapter!!.itemCount + replyOffset)
+            replyOffset = 0
         }
     }
 
     private fun bindListeners() = binding.apply {
+        chatRecyclerview.addOnScrollListener(object: OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                userHasScrolled = true
+                if (chatRecyclerview.computeVerticalScrollOffset() < 1000)
+                    viewModel.requestNextPage()
+            }
+        }) 
         sendButtonIb.setOnClickListener {
             val messages = mutableListOf<Message>()
             val message = Message(
@@ -122,31 +144,30 @@ class ChatFragment: Fragment(R.layout.chat_fragment) {
             }
 
         }
-
-        bindKeyboardOpeningListener()
+        addOnKeyboardIsShownListener()
     }
 
     private fun setupInitialLayoutPreferences() {
         binding.sendButtonIb.isEnabled = false
     }
 
-    private fun bubbleTailCheck(index: Int, message: Message, prevMessage: Message, chat: Chat): Boolean {
-        return if (index == chat.messages.size - 1)
+    private fun bubbleTailCheck(index: Int, message: Message, prevMessage: Message, messages: List<Message>): Boolean {
+        return if (index == messages.size - 1)
             true
         else if (message.user != prevMessage.user)
             true
         else message.timestamp.minus(prevMessage.timestamp) > TWENTY_SECONDS
     }
 
-    private fun bindKeyboardOpeningListener() = binding.apply {
+    private fun addOnKeyboardIsShownListener() = binding.apply {
         chatFragmentWrap.viewTreeObserver.addOnGlobalLayoutListener {
             val r = Rect()
             chatFragmentWrap.getWindowVisibleDisplayFrame(r);
             val screenHeight = chatFragmentWrap.rootView.height;
             val keypadHeight = screenHeight - r.bottom;
 
-            if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is enough to determine keypad height.
-                chatRecyclerview.smoothScrollToPosition(chatRecyclerview.adapter?.itemCount ?: 0)
+            if (keypadHeight > screenHeight * 0.15 && chatRecyclerview.canScrollVertically(1)) { // 0.15 ratio is enough to determine keypad height.
+                chatRecyclerview.layoutManager!!.scrollToPosition(chatRecyclerview.adapter!!.itemCount - 1)
             }
         }
     }

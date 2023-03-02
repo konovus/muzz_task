@@ -71,6 +71,7 @@ dependencies {
     implementation "com.airbnb.android:epoxy-databinding:$epoxyVersion"
     kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     annotationProcessor "com.airbnb.android:epoxy-processor:$epoxyVersion"
+    implementation "com.airbnb.android:epoxy-paging:$epoxyVersion"
 
     // Room
     implementation "androidx.room:room-runtime:$roomVersion"

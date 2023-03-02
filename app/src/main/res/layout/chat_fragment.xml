@@ -67,6 +67,7 @@
         android:layout_height="0dp"
         tools:listitem="@layout/sender_message_item"
         app:itemSpacing="12dp"
+        app:stackFromEnd="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/shadow_appbar"
         app:layout_constraintBottom_toTopOf="@id/shadow_send_text"/>
